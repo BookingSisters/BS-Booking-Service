@@ -1,4 +1,4 @@
-package com.bs.bks.controller;
+package com.bs.booking.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
