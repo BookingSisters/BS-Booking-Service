@@ -8,10 +8,11 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JasyptConfig {
+
     /* 암복호화에 사용할 키 */
     private final static String KEY = "bs-postgres-salt";
 
-    @Bean(name="jasyptStringEncryptor")
+    @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
         SimpleStringPBEConfig config = new SimpleStringPBEConfig();
         config.setPassword(KEY);
