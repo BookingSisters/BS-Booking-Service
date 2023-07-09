@@ -40,7 +40,7 @@ class SessionSeatServiceTest {
         // given
         List<SessionSeat> sessionSeatList = new ArrayList<>();
         sessionSeatList.add(new SessionSeat());
-        when(sessionSeatRepository.findAllByDeletedAtIsNull()).thenReturn(sessionSeatList);
+        when(sessionSeatRepository.findAllByIsDeletedIsFalse()).thenReturn(sessionSeatList);
         // when
         List<SessionSeatResponseDto> result = sessionSeatService.getAllSeats();
         // then
@@ -79,6 +79,7 @@ class SessionSeatServiceTest {
         sessionSeatService.deleteSeat(1L);
         // then
         assertThat(sessionSeat.getDeletedAt()).isNotNull();
+        assertThat(sessionSeat.isDeleted()).isTrue();
     }
 
     @DisplayName("좌석 삭제: id없음 예외 처리 테스트")

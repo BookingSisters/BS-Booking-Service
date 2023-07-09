@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -15,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -24,12 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "session_seat")
-public class SessionSeat {
-
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class SessionSeat extends BaseEntity {
 
     @Column(nullable = false)
     private Long performId;
@@ -43,10 +35,11 @@ public class SessionSeat {
     @OneToMany(mappedBy = "sessionSeat")
     private List<Reservation> reservations = new ArrayList<>();
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
     private LocalDateTime deletedAt;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean isDeleted;
 
     public SessionSeat(long performId, long sessionId, long seatGradeId) {
         this.performId = performId;
@@ -54,7 +47,8 @@ public class SessionSeat {
         this.seatGradeId = seatGradeId;
     }
 
-    public void setDeletedAt() {
+    public void delete() {
         this.deletedAt = LocalDateTime.now();
+        this.isDeleted = true;
     }
 }

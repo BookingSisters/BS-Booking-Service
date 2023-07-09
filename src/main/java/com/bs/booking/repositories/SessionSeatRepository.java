@@ -12,9 +12,9 @@ import org.springframework.data.repository.query.Param;
 public interface SessionSeatRepository extends CrudRepository<SessionSeat, Long>,
     SessionSeatSupportRepository {
 
-    List<SessionSeat> findAllByDeletedAtIsNull();
+    List<SessionSeat> findAllByIsDeletedIsFalse();
 
-    Optional<SessionSeat> findByIdAndDeletedAtIsNull(long id);
+    Optional<SessionSeat> findByIdAndIsDeletedIsFalse(long id);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from SessionSeat s where s.id = :id and s.deletedAt is null")

@@ -27,26 +27,18 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "reservation")
-public class Reservation {
-
-    @Id
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Reservation extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_seat_id", nullable = false)
     private SessionSeat sessionSeat;
 
     @Column(nullable = false)
-    private Long userId;
+    private String userId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
 
     public Reservation(SessionSeat sessionSeat, ReservationCreateDto valuesForCreate) {
         this.sessionSeat = Objects.requireNonNull(sessionSeat, "seat must not be null");
