@@ -1,0 +1,63 @@
+name: TEST AWS ECR+EC2 CI/CD
+
+on:
+  push:
+    branches: [ "feature/**", "bugfix/**" ]
+  pull_request:
+    branches: [ "feature/**", "bugfix/**" ]
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+  CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      env:
+        AWS_EC2_HOST: ${{ secrets.AWS_EC2_HOST }}
+        AWS_EC2_USERNAME: ${{ secrets.AWS_EC2_USERNAME }}
+        AWS_EC2_SSH_KEY: ${{ secrets.AWS_EC2_SSH_KEY }}
+      with:
+        host: ${{ env.AWS_EC2_HOST }}
+        username: ${{ env.AWS_EC2_USERNAME }}
+        key: ${{ env.AWS_EC2_SSH_KEY }}
+        script: |
+          docker login -u AWS -p $(aws ecr get-login-password --region ${{ env.AWS_REGION }}) ${{ steps.login-ecr.outputs.registry }}
+          docker pull ${{ steps.build-image.outputs.image }}
+          docker stop ${{ env.CONTAINER_NAME }}
+          docker rm ${{ env.CONTAINER_NAME }}
+          docker run --rm -d --name ${{ env.CONTAINER_NAME }} -p 80:8080 ${{ steps.build-image.outputs.image }}
