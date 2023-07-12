@@ -9,8 +9,6 @@ import com.bs.booking.models.Reservation;
 import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.ReservationRepository;
 import com.bs.booking.repositories.SessionSeatRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,9 +37,6 @@ public class ReservationServiceMultiThreadedTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @BeforeEach
     void setUp() {
         SessionSeat sessionSeat = new SessionSeat(1L, 1L, 1L);
@@ -52,7 +47,7 @@ public class ReservationServiceMultiThreadedTest {
     @Test
     void createReservation_whenMultiThreaded_shouldCreateOnlyOneReservation() {
         int threadCount = 10;
-        ReservationCreateDto createDto = new ReservationCreateDto(1L, 1L);
+        ReservationCreateDto createDto = new ReservationCreateDto(1L, "testUser");
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Future<ReservationResponseDto>> futures = new ArrayList<>();

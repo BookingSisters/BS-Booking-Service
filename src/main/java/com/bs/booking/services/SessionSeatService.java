@@ -2,6 +2,7 @@ package com.bs.booking.services;
 
 import com.bs.booking.dtos.SessionSeatCreateDto;
 import com.bs.booking.dtos.SessionSeatResponseDto;
+import com.bs.booking.exceptions.AlreadyExistSeatException;
 import com.bs.booking.exceptions.SeatNotFoundException;
 import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.SessionSeatRepository;
@@ -21,16 +22,20 @@ public class SessionSeatService {
 
     @Transactional(readOnly = true)
     public List<SessionSeatResponseDto> getAllSeats() {
-        List<SessionSeat> sessionSeats = sessionSeatRepository.findAllByDeletedAtIsNull();
+        List<SessionSeat> sessionSeats = sessionSeatRepository.findAllByIsDeletedIsFalse();
 
-        return sessionSeats.stream()
-            .map(seatMapper::toSessionSeatResponseDto)
+        return sessionSeats.stream().map(seatMapper::toSessionSeatResponseDto)
             .collect(Collectors.toList());
     }
 
     @Transactional
     public SessionSeatResponseDto createSeat(SessionSeatCreateDto valuesForCreate) {
         SessionSeat newSessionSeat = seatMapper.toSessionSeat(valuesForCreate);
+
+        if (sessionSeatRepository.exists(valuesForCreate)) {
+            throw new AlreadyExistSeatException(valuesForCreate);
+        }
+
         sessionSeatRepository.save(newSessionSeat);
         return seatMapper.toSessionSeatResponseDto(newSessionSeat);
     }
@@ -39,6 +44,6 @@ public class SessionSeatService {
     public void deleteSeat(long id) throws IllegalArgumentException {
         SessionSeat dbSessionSeat = sessionSeatRepository.findById(id)
             .orElseThrow(() -> new SeatNotFoundException(id));
-        dbSessionSeat.setDeletedAt();
+        dbSessionSeat.delete();
     }
 }

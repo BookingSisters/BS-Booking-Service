@@ -64,7 +64,7 @@ class ReservationServiceTest {
     @Test
     void createReservation() {
         // given
-        ReservationCreateDto valuesForCreate = new ReservationCreateDto(1L, 1L);
+        ReservationCreateDto valuesForCreate = new ReservationCreateDto(1L, "testUser");
         SessionSeat sessionSeat = new SessionSeat();
         Reservation reservation = new Reservation(sessionSeat, valuesForCreate);
         ReservationResponseDto expectedReservation = new ReservationResponseDto();

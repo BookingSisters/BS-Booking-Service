@@ -15,7 +15,7 @@ public class ReservationResponseDto {
 
     private Long id;
     private Long sessionSeatId;
-    private Long userId;
+    private String userId;
     private ReservationStatus status;
     private LocalDateTime createdAt;
 }

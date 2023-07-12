@@ -16,5 +16,5 @@ public class ReservationCreateDto {
     private Long sessionSeatId;
 
     @NotNull(message = "사용자 id는 필수입니다")
-    private Long userId;
+    private String userId;
 }
