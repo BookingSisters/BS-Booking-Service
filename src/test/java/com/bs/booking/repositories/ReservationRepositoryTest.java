@@ -34,9 +34,9 @@ class ReservationRepositoryTest {
         sessionSeat = new SessionSeat(1L, 1L, 1L);
         testEntityManager.persistAndFlush(sessionSeat);
         ReservationCreateDto createDto = new ReservationCreateDto(1L, "testUser");
-        Reservation reservation1 = new Reservation(sessionSeat, createDto);
-        Reservation reservation2 = new Reservation(sessionSeat, createDto);
-        Reservation reservation3 = new Reservation(sessionSeat, createDto);
+        Reservation reservation1 = new Reservation(sessionSeat, createDto.getUserId());
+        Reservation reservation2 = new Reservation(sessionSeat, createDto.getUserId());
+        Reservation reservation3 = new Reservation(sessionSeat, createDto.getUserId());
         reservation2.setStatus(ReservationStatus.CANCEL);
         reservation3.setStatus(ReservationStatus.TIME_OUT);
         testEntityManager.persistAndFlush(reservation1);

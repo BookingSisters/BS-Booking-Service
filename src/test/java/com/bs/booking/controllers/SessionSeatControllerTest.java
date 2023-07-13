@@ -3,6 +3,7 @@ package com.bs.booking.controllers;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -13,6 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.bs.booking.dtos.SessionSeatCreateDto;
 import com.bs.booking.dtos.SessionSeatResponseDto;
+import com.bs.booking.dtos.SessionSeatsCreateDto;
 import com.bs.booking.services.SessionSeatService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -55,7 +58,7 @@ class SessionSeatControllerTest {
 
     @DisplayName("controller: 좌석 생성 테스트")
     @Test
-    void createSeat() throws Exception {
+    void createSessionSeat() throws Exception {
         // given
         String valToCreate =
             "{\"performId\":1,\"sessionId\":1,\"seatGradeId\":1}";
@@ -71,7 +74,7 @@ class SessionSeatControllerTest {
 
     @DisplayName("controller: 좌석 생성 requestBody 일부 값 누락 테스트")
     @Test
-    void createSeat_whenNotEnoughRequestBody_shouldThrowsException() throws Exception {
+    void createSessionSeat_whenNotEnoughRequestBody_shouldThrowsException() throws Exception {
         // given
         SessionSeatCreateDto valToCreate = new SessionSeatCreateDto(null, null, null);
 
@@ -81,8 +84,7 @@ class SessionSeatControllerTest {
                 .content(new ObjectMapper().writeValueAsString(valToCreate)))
             .andExpect(status().isBadRequest())
             .andExpect(result -> assertTrue(
-                result.getResolvedException() instanceof MethodArgumentNotValidException))
-            .andDo(result -> System.out.println(result.getResponse().getContentAsString()));
+                result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
 
@@ -93,5 +95,41 @@ class SessionSeatControllerTest {
 
         mockMvc.perform(delete("/seat/1"))
             .andExpect(status().isOk());
+    }
+
+    @DisplayName("controller: 여러 좌석 생성 테스트")
+    @Test
+    void createSessionSeats() throws Exception {
+        // given
+        String valToCreate =
+            "{\"data\":[{\"performId\":1,\"sessionId\":1,\"seatGradeId\":1}]}";
+        SessionSeatResponseDto seat = SessionSeatResponseDto.builder().build();
+
+        doNothing().when(sessionSeatService)
+            .createSeats(anyLong(), any(SessionSeatsCreateDto.class));
+        //when, then
+        mockMvc.perform(post("/seat/" + 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(valToCreate))
+            .andExpect(status().isCreated());
+    }
+
+    @DisplayName("controller: 여러 좌석 생성 requestBody 일부 값 누락 테스트")
+    @Test
+    void createSessionSeats_whenNotEnoughRequestBody_shouldThrowsException() throws Exception {
+        // given
+        String valToCreate =
+            "{\"data\":[{\"performId\":1,\"sessionId\":1}]}";
+        SessionSeatResponseDto seat = SessionSeatResponseDto.builder().build();
+
+        doNothing().when(sessionSeatService)
+            .createSeats(anyLong(), any(SessionSeatsCreateDto.class));
+
+        mockMvc.perform(post("/seat/" + 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(valToCreate))
+            .andExpect(status().isBadRequest())
+            .andExpect(result -> assertTrue(
+                result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 }

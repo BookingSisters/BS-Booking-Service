@@ -10,6 +10,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -50,5 +51,23 @@ public class SessionSeat extends BaseEntity {
     public void delete() {
         this.deletedAt = LocalDateTime.now();
         this.isDeleted = true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SessionSeat that = (SessionSeat) o;
+        return Objects.equals(performId, that.performId) && Objects.equals(
+            sessionId, that.sessionId) && Objects.equals(seatGradeId, that.seatGradeId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(performId, sessionId, seatGradeId);
     }
 }

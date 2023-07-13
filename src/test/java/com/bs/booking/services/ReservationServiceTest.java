@@ -66,7 +66,7 @@ class ReservationServiceTest {
         // given
         ReservationCreateDto valuesForCreate = new ReservationCreateDto(1L, "testUser");
         SessionSeat sessionSeat = new SessionSeat();
-        Reservation reservation = new Reservation(sessionSeat, valuesForCreate);
+        Reservation reservation = new Reservation(sessionSeat, valuesForCreate.getUserId());
         ReservationResponseDto expectedReservation = new ReservationResponseDto();
 
         when(sessionSeatRepository.findByIdWithLock(any(Long.class))).thenReturn(

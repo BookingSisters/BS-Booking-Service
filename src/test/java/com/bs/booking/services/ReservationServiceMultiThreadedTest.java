@@ -9,6 +9,7 @@ import com.bs.booking.models.Reservation;
 import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.ReservationRepository;
 import com.bs.booking.repositories.SessionSeatRepository;
+import com.bs.booking.utils.mapper.ReservationMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -17,15 +18,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+import org.h2.engine.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ReservationServiceMultiThreadedTest {
 
     @Autowired
@@ -37,9 +42,14 @@ public class ReservationServiceMultiThreadedTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private ReservationMapper reservationMapper;
+
+    private SessionSeat sessionSeat;
+
     @BeforeEach
     void setUp() {
-        SessionSeat sessionSeat = new SessionSeat(1L, 1L, 1L);
+        sessionSeat = new SessionSeat(1L, 1L, 1L);
         sessionSeatRepository.save(sessionSeat);
     }
 
@@ -47,7 +57,7 @@ public class ReservationServiceMultiThreadedTest {
     @Test
     void createReservation_whenMultiThreaded_shouldCreateOnlyOneReservation() {
         int threadCount = 10;
-        ReservationCreateDto createDto = new ReservationCreateDto(1L, "testUser");
+        ReservationCreateDto createDto = new ReservationCreateDto(sessionSeat.getId(), "testUser");
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Future<ReservationResponseDto>> futures = new ArrayList<>();

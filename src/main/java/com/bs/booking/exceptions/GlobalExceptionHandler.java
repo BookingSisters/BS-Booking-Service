@@ -42,4 +42,20 @@ public class GlobalExceptionHandler {
         log.error(errorMessage, e);
         return ResponseDto.builder().status("failed").message(errorMessage).build();
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(AlreadyExistSeatException.class)
+    public ResponseDto handleAlreadyExistSeatException(AlreadyExistSeatException e) {
+        String errorMessage = e.getMessage();
+        log.error(errorMessage, e);
+        return ResponseDto.builder().status("failed").message(errorMessage).build();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SeatNotFoundException.class)
+    public ResponseDto handleSeatNotFoundException(AlreadyExistSeatException e) {
+        String errorMessage = e.getMessage();
+        log.error(errorMessage, e);
+        return ResponseDto.builder().status("failed").message(errorMessage).build();
+    }
 }
