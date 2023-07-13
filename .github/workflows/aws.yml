@@ -1,4 +1,4 @@
-name: PROD AWS ECR+ECS CI/CD
+name: PROD BUILD&PUSH TO ECR
 
 on:
   push:
