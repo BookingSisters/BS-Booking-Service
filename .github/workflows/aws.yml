@@ -3,7 +3,8 @@ name: PROD BUILD&PUSH TO ECR
 on:
   push:
     branches: [ "main" ]
-
+  pull_request:
+    branches: [ "main" ]
 env:
   AWS_REGION: ap-northeast-2                   
   ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}       

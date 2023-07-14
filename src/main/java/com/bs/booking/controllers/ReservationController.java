@@ -1,21 +1,26 @@
 package com.bs.booking.controllers;
 
+import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
 import com.bs.booking.dtos.ReservationUpdateDto;
-import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.services.ReservationService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/reservation")
+@RequestMapping(value = "/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;

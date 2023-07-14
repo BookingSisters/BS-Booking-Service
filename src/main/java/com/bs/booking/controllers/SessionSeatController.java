@@ -2,6 +2,7 @@ package com.bs.booking.controllers;
 
 import com.bs.booking.dtos.SessionSeatCreateDto;
 import com.bs.booking.dtos.SessionSeatResponseDto;
+import com.bs.booking.dtos.SessionSeatsCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.services.SessionSeatService;
 import jakarta.validation.Valid;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/seat")
+@RequestMapping(value = "/seats")
 public class SessionSeatController {
 
     private final SessionSeatService sessionSeatService;
@@ -33,10 +34,16 @@ public class SessionSeatController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDto createSeat(
-        @Valid @RequestBody SessionSeatCreateDto valuesForCreate) {
+    public ResponseDto createSessionSeat(@Valid @RequestBody SessionSeatCreateDto valuesForCreate) {
         SessionSeatResponseDto created = sessionSeatService.createSeat(valuesForCreate);
         return new ResponseDto("success", "SessionSeats created successfully", created);
+    }
+
+    @PostMapping("/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseDto createSessionSeats(@Valid @RequestBody SessionSeatsCreateDto valuesForCreate) {
+        sessionSeatService.createSeats(valuesForCreate);
+        return new ResponseDto("success", "SessionSeats created successfully", null);
     }
 
     @DeleteMapping("/{id}")

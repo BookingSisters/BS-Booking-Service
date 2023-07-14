@@ -66,14 +66,14 @@ class ReservationServiceTest {
         // given
         ReservationCreateDto valuesForCreate = new ReservationCreateDto(1L, "testUser");
         SessionSeat sessionSeat = new SessionSeat();
-        Reservation reservation = new Reservation(sessionSeat, valuesForCreate);
+        Reservation reservation = new Reservation(sessionSeat, valuesForCreate.getUserId());
         ReservationResponseDto expectedReservation = new ReservationResponseDto();
 
         when(sessionSeatRepository.findByIdWithLock(any(Long.class))).thenReturn(
             Optional.of(sessionSeat));
-        when(reservationRepository.findBySessionSeatIdAndStatus(any(Long.class),
+        when(reservationRepository.existsBySessionSeatIdAndStatus(any(Long.class),
             any(ReservationStatus.class)))
-            .thenReturn(Optional.empty());
+            .thenReturn(false);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
         when(reservationMapper.toReservationResponseDto(any(Reservation.class))).thenReturn(
             expectedReservation);
