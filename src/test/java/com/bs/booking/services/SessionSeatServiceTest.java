@@ -80,7 +80,7 @@ class SessionSeatServiceTest {
     void deleteSeat() {
         // given
         SessionSeat sessionSeat = new SessionSeat();
-        when(sessionSeatRepository.findById(any(Long.class))).thenReturn(Optional.of(sessionSeat));
+        when(sessionSeatRepository.findByIdAndIsDeletedIsFalse(any(Long.class))).thenReturn(Optional.of(sessionSeat));
         // when
         sessionSeatService.deleteSeat(1L);
         // then
@@ -93,7 +93,7 @@ class SessionSeatServiceTest {
     void deleteSeat_whenSeatNotFound_throwsProperException() {
         // given
         long incorrectId = 1L;
-        when(sessionSeatRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+        when(sessionSeatRepository.findByIdAndIsDeletedIsFalse(any(Long.class))).thenReturn(Optional.empty());
         // when, then
         assertThrows(IllegalArgumentException.class,
             () -> sessionSeatService.deleteSeat(incorrectId));

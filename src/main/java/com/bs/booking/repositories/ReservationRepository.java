@@ -11,5 +11,5 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     List<Reservation> findAllByStatus(ReservationStatus status);
 
-    Optional<Reservation> findBySessionSeatIdAndStatus(long sessionSeatId, ReservationStatus status);
+    boolean existsBySessionSeatIdAndStatus(long sessionSeatId, ReservationStatus status);
 }

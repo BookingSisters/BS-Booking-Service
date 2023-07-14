@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(SeatNotFoundException.class)
-    public ResponseDto handleSeatNotFoundException(AlreadyExistSeatException e) {
+    public ResponseDto handleSeatNotFoundException(SeatNotFoundException e) {
         String errorMessage = e.getMessage();
         log.error(errorMessage, e);
         return ResponseDto.builder().status("failed").message(errorMessage).build();

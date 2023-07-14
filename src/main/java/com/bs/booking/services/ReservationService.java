@@ -53,8 +53,8 @@ public class ReservationService {
             return new SeatNotFoundException(seatId);
         });
 
-        if (reservationRepository.findBySessionSeatIdAndStatus(seatId, ReservationStatus.PENDING)
-            .isPresent()) {
+        if (reservationRepository.existsBySessionSeatIdAndStatus(seatId,
+            ReservationStatus.PENDING)) {
             log.error("Error when creating reservation, already in progress with seatId: {}",
                 seatId);
             throw new ReservationInProgressException(seatId);

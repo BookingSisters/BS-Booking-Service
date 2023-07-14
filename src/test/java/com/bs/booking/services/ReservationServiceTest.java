@@ -71,9 +71,9 @@ class ReservationServiceTest {
 
         when(sessionSeatRepository.findByIdWithLock(any(Long.class))).thenReturn(
             Optional.of(sessionSeat));
-        when(reservationRepository.findBySessionSeatIdAndStatus(any(Long.class),
+        when(reservationRepository.existsBySessionSeatIdAndStatus(any(Long.class),
             any(ReservationStatus.class)))
-            .thenReturn(Optional.empty());
+            .thenReturn(false);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
         when(reservationMapper.toReservationResponseDto(any(Reservation.class))).thenReturn(
             expectedReservation);

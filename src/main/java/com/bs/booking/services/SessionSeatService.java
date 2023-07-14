@@ -63,7 +63,7 @@ public class SessionSeatService {
 
     @Transactional
     public void deleteSeat(long id) {
-        SessionSeat dbSessionSeat = sessionSeatRepository.findById(id)
+        SessionSeat dbSessionSeat = sessionSeatRepository.findByIdAndIsDeletedIsFalse(id)
             .orElseThrow(() -> {
                 log.error("Error when deleting seat, seat not found with id: {}", id);
                 return new SeatNotFoundException(id);
