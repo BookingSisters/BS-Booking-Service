@@ -103,7 +103,6 @@ class SessionSeatServiceTest {
     @Test
     void createSeats() {
         // given
-        long id = 1L;
         SessionSeatsCreateDto sessionSeatsCreateDto = new SessionSeatsCreateDto();
         List<SessionSeatCreateDto> seatCreateDtoList = new ArrayList<>();
         SessionSeatCreateDto createDto = new SessionSeatCreateDto();
@@ -116,7 +115,7 @@ class SessionSeatServiceTest {
         when(sessionSeatRepository.exists(any(SessionSeatCreateDto.class))).thenReturn(false);
 
         // when
-        sessionSeatService.createSeats(id, sessionSeatsCreateDto);
+        sessionSeatService.createSeats(sessionSeatsCreateDto);
         // then
         verify(sessionSeatRepository, times(seatCreateDtoList.size())).exists(
             any(SessionSeatCreateDto.class));
@@ -129,7 +128,6 @@ class SessionSeatServiceTest {
     @Test
     void createSeats_shouldSaveUniqueSeatsOnly() {
         // given
-        long id = 1L;
         SessionSeatCreateDto createDto = new SessionSeatCreateDto(1L, 1L, 1L);
         SessionSeatsCreateDto valuesForCreate = new SessionSeatsCreateDto(
             Arrays.asList(createDto, createDto));
@@ -146,7 +144,7 @@ class SessionSeatServiceTest {
         when(sessionSeatRepository.saveAll(argumentCaptor.capture())).thenReturn(new ArrayList<>());
 
         // when
-        sessionSeatService.createSeats(id, valuesForCreate);
+        sessionSeatService.createSeats(valuesForCreate);
         // then
         verify(sessionSeatMapper, times(2)).toSessionSeat(any(SessionSeatCreateDto.class));
         List<SessionSeat> savedSeats = argumentCaptor.getValue();

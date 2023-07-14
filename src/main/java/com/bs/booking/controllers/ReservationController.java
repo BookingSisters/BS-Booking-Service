@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/reservation")
+@RequestMapping(value = "/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;

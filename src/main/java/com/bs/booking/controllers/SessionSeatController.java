@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(value = "/seat")
+@RequestMapping(value = "/seats")
 public class SessionSeatController {
 
     private final SessionSeatService sessionSeatService;
@@ -39,11 +39,10 @@ public class SessionSeatController {
         return new ResponseDto("success", "SessionSeats created successfully", created);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/batch")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDto createSessionSeats(@PathVariable long id,
-        @Valid @RequestBody SessionSeatsCreateDto valuesForCreate) {
-        sessionSeatService.createSeats(id, valuesForCreate);
+    public ResponseDto createSessionSeats(@Valid @RequestBody SessionSeatsCreateDto valuesForCreate) {
+        sessionSeatService.createSeats(valuesForCreate);
         return new ResponseDto("success", "SessionSeats created successfully", null);
     }
 

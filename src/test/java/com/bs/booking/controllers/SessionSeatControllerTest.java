@@ -41,6 +41,8 @@ class SessionSeatControllerTest {
     @MockBean
     private SessionSeatService sessionSeatService;
 
+    private String BASE_URL = "/seats";
+
     @DisplayName("controller: 좌석 목록 가져오기")
     @Test
     void getSeatList() throws Exception {
@@ -51,7 +53,7 @@ class SessionSeatControllerTest {
 
         when(sessionSeatService.getAllSeats()).thenReturn(seats);
         // when, then
-        mockMvc.perform(get("/seat"))
+        mockMvc.perform(get(BASE_URL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", hasSize(1)));
     }
@@ -66,7 +68,7 @@ class SessionSeatControllerTest {
 
         when(sessionSeatService.createSeat(any(SessionSeatCreateDto.class))).thenReturn(seat);
         // when, then
-        mockMvc.perform(post("/seat")
+        mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isCreated());
@@ -79,7 +81,7 @@ class SessionSeatControllerTest {
         SessionSeatCreateDto valToCreate = new SessionSeatCreateDto(null, null, null);
 
         // when, then
-        mockMvc.perform(post("/seat")
+        mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(new ObjectMapper().writeValueAsString(valToCreate)))
             .andExpect(status().isBadRequest())
@@ -93,7 +95,7 @@ class SessionSeatControllerTest {
     void deleteSeat() throws Exception {
         doNothing().when(sessionSeatService).deleteSeat(1L);
 
-        mockMvc.perform(delete("/seat/1"))
+        mockMvc.perform(delete(BASE_URL+"/1"))
             .andExpect(status().isOk());
     }
 
@@ -106,9 +108,9 @@ class SessionSeatControllerTest {
         SessionSeatResponseDto seat = SessionSeatResponseDto.builder().build();
 
         doNothing().when(sessionSeatService)
-            .createSeats(anyLong(), any(SessionSeatsCreateDto.class));
+            .createSeats(any(SessionSeatsCreateDto.class));
         //when, then
-        mockMvc.perform(post("/seat/" + 1L)
+        mockMvc.perform(post(BASE_URL+"/batch")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isCreated());
@@ -123,9 +125,9 @@ class SessionSeatControllerTest {
         SessionSeatResponseDto seat = SessionSeatResponseDto.builder().build();
 
         doNothing().when(sessionSeatService)
-            .createSeats(anyLong(), any(SessionSeatsCreateDto.class));
+            .createSeats(any(SessionSeatsCreateDto.class));
 
-        mockMvc.perform(post("/seat/" + 1L)
+        mockMvc.perform(post(BASE_URL+"/batch")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isBadRequest())

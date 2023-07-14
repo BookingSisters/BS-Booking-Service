@@ -40,6 +40,8 @@ class ReservationControllerTest {
     @MockBean
     private ReservationService reservationService;
 
+    private String BASE_URL = "/reservations";
+
     @DisplayName("controller : 예약 목록 가져오기")
     @Test
     void getReservationList() throws Exception {
@@ -52,7 +54,7 @@ class ReservationControllerTest {
 
         when(reservationService.getAllReservation()).thenReturn(reservations);
         // when, then
-        mockMvc.perform(get("/reservation"))
+        mockMvc.perform(get(BASE_URL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data", hasSize(1)))
             .andExpect(jsonPath("$.data[0].status", is(expectStatus.toString())));
@@ -70,7 +72,7 @@ class ReservationControllerTest {
         when(reservationService.createReservation(any(ReservationCreateDto.class))).thenReturn(
             reservation);
         // when, then
-        mockMvc.perform(post("/reservation")
+        mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isCreated())
@@ -84,7 +86,7 @@ class ReservationControllerTest {
         String valToCreate = "{\"userId\":1}";
 
         // when, then
-        mockMvc.perform(post("/reservation")
+        mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isBadRequest());
@@ -101,7 +103,7 @@ class ReservationControllerTest {
         when(reservationService.updateStatus(anyLong(), any(ReservationStatus.class)))
             .thenReturn(reservation);
         // when, then
-        mockMvc.perform(put("/reservation/1")
+        mockMvc.perform(put(BASE_URL+"/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToUpdate))
             .andExpect(status().isOk())
@@ -115,7 +117,7 @@ class ReservationControllerTest {
         String valToUpdate = "{\"noStatus\":\"fd\"}";
 
         // when, then
-        mockMvc.perform(put("/reservation/1")
+        mockMvc.perform(put(BASE_URL+"/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToUpdate))
             .andExpect(status().isBadRequest())
@@ -130,7 +132,7 @@ class ReservationControllerTest {
         String valToUpdate = "{\"status\":\"fd\"}";
 
         // when, then
-        mockMvc.perform(put("/reservation/1")
+        mockMvc.perform(put(BASE_URL+"/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToUpdate))
             .andExpect(status().isBadRequest())

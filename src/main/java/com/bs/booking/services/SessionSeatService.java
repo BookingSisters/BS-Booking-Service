@@ -49,7 +49,7 @@ public class SessionSeatService {
     }
 
     @Transactional
-    public void createSeats(long id, SessionSeatsCreateDto valuesForCreate) {
+    public void createSeats(SessionSeatsCreateDto valuesForCreate) {
         Set<SessionSeat> newSessionSeats = new HashSet<>();
         log.info("Creating seats. Total number of seats: {}", valuesForCreate.getData().size());
 
