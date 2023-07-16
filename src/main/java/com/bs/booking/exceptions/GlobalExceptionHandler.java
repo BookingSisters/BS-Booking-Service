@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.joining(", "));
         log.error(errorMessage, e);
-        return ResponseDto.builder().status("failed").message(errorMessage).build();
+        return ResponseDto.builder().status("failed").message("잘못된 요청 값입니다: " + errorMessage).build();
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

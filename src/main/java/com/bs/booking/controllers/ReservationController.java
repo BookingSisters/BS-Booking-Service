@@ -32,11 +32,11 @@ public class ReservationController {
         return new ResponseDto("success", "Reservations retrieved successfully", reservations);
     }
 
-    @PostMapping
+    @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseDto createReservation(
+    public ResponseDto createReservation(@PathVariable long id,
         @Valid @RequestBody ReservationCreateDto valuesForCreate) {
-        ReservationResponseDto created = reservationService.createReservation(valuesForCreate);
+        ReservationResponseDto created = reservationService.createReservation(id, valuesForCreate);
         return new ResponseDto("success", "Reservation created successfully", created);
     }
 

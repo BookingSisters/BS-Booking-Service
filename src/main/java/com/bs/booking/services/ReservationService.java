@@ -1,5 +1,7 @@
 package com.bs.booking.services;
 
+import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
 import com.bs.booking.enums.ReservationStatus;
@@ -11,7 +13,6 @@ import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.ReservationRepository;
 import com.bs.booking.repositories.SessionSeatRepository;
 import com.bs.booking.utils.mapper.ReservationMapper;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final SessionSeatRepository sessionSeatRepository;
     private final ReservationMapper reservationMapper;
+    private final PaymentServiceClient paymentServiceClient;
 
     @Transactional(readOnly = true)
     public List<ReservationResponseDto> getAllReservation() {
@@ -43,15 +45,15 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponseDto createReservation(ReservationCreateDto valuesForCreate) {
+    public ReservationResponseDto createReservation(long seatId,
+        ReservationCreateDto valuesForCreate) {
         log.info("Creating reservation with values: {}", valuesForCreate);
 
-        long seatId = valuesForCreate.getSessionSeatId();
-        Optional<SessionSeat> optionalSeat = sessionSeatRepository.findByIdWithLock(seatId);
-        SessionSeat dbSessionSeat = optionalSeat.orElseThrow(() -> {
-            log.error("Error when creating reservation, seat not found with id: {}", seatId);
-            return new SeatNotFoundException(seatId);
-        });
+        SessionSeat dbSessionSeat = sessionSeatRepository.findByIdWithLock(seatId)
+            .orElseThrow(() -> {
+                log.error("Error when creating reservation, seat not found with id: {}", seatId);
+                return new SeatNotFoundException(seatId);
+            });
 
         if (reservationRepository.existsBySessionSeatIdAndStatus(seatId,
             ReservationStatus.PENDING)) {
@@ -62,6 +64,10 @@ public class ReservationService {
 
         Reservation newReservation = new Reservation(dbSessionSeat, valuesForCreate.getUserId());
         reservationRepository.save(newReservation);
+
+        PaymentCreateDto paymentCreateDto = new PaymentCreateDto(newReservation.getId(),
+            valuesForCreate.getUserId());
+        paymentServiceClient.createPayment(paymentCreateDto);
 
         log.info("Successfully created reservation");
         return reservationMapper.toReservationResponseDto(newReservation);
