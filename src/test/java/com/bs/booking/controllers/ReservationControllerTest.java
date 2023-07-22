@@ -54,8 +54,7 @@ class ReservationControllerTest {
 
         when(reservationService.getAllReservation()).thenReturn(reservations);
         // when, then
-        mockMvc.perform(get(BASE_URL))
-            .andExpect(status().isOk())
+        mockMvc.perform(get(BASE_URL)).andExpect(status().isOk())
             .andExpect(jsonPath("$.data", hasSize(1)))
             .andExpect(jsonPath("$.data[0].status", is(expectStatus.toString())));
     }
@@ -65,14 +64,14 @@ class ReservationControllerTest {
     void createReservation() throws Exception {
         // given
         ReservationStatus expectStatus = ReservationStatus.PENDING;
-        String valToCreate = "{\"sessionSeatId\":1,\"userId\":1}";
-        ReservationResponseDto reservation = ReservationResponseDto
-            .builder().status(expectStatus).build();
+        String valToCreate = "{\"userId\":1}";
+        ReservationResponseDto reservation = ReservationResponseDto.builder().status(expectStatus)
+            .build();
 
-        when(reservationService.createReservation(any(ReservationCreateDto.class))).thenReturn(
-            reservation);
+        when(reservationService.createReservation(anyLong(),
+            any(ReservationCreateDto.class))).thenReturn(reservation);
         // when, then
-        mockMvc.perform(post(BASE_URL)
+        mockMvc.perform(post(BASE_URL + "/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(valToCreate))
             .andExpect(status().isCreated())
@@ -83,12 +82,10 @@ class ReservationControllerTest {
     @Test
     void createReservation_whenNotEnoughRequestBody_shouldThrowsException() throws Exception {
         // given
-        String valToCreate = "{\"userId\":1}";
+        String valToCreate = "{}";
 
         // when, then
-        mockMvc.perform(post(BASE_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(valToCreate))
+        mockMvc.perform(post(BASE_URL+"/1").contentType(MediaType.APPLICATION_JSON).content(valToCreate))
             .andExpect(status().isBadRequest());
     }
 
@@ -98,14 +95,13 @@ class ReservationControllerTest {
         // given
         ReservationStatus expectStatus = ReservationStatus.CANCEL;
         String valToUpdate = "{\"status\":\"" + expectStatus.name() + "\"}";
-        ReservationResponseDto reservation = ReservationResponseDto
-            .builder().status(expectStatus).build();
-        when(reservationService.updateStatus(anyLong(), any(ReservationStatus.class)))
-            .thenReturn(reservation);
+        ReservationResponseDto reservation = ReservationResponseDto.builder().status(expectStatus)
+            .build();
+        when(reservationService.updateStatus(anyLong(), any(ReservationStatus.class))).thenReturn(
+            reservation);
         // when, then
-        mockMvc.perform(put(BASE_URL+"/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(valToUpdate))
+        mockMvc.perform(
+                put(BASE_URL + "/1").contentType(MediaType.APPLICATION_JSON).content(valToUpdate))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.status", is(expectStatus.toString())));
     }
@@ -117,11 +113,9 @@ class ReservationControllerTest {
         String valToUpdate = "{\"noStatus\":\"fd\"}";
 
         // when, then
-        mockMvc.perform(put(BASE_URL+"/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(valToUpdate))
-            .andExpect(status().isBadRequest())
-            .andExpect(result -> assertTrue(
+        mockMvc.perform(
+                put(BASE_URL + "/1").contentType(MediaType.APPLICATION_JSON).content(valToUpdate))
+            .andExpect(status().isBadRequest()).andExpect(result -> assertTrue(
                 result.getResolvedException() instanceof MethodArgumentNotValidException));
     }
 
@@ -132,11 +126,9 @@ class ReservationControllerTest {
         String valToUpdate = "{\"status\":\"fd\"}";
 
         // when, then
-        mockMvc.perform(put(BASE_URL+"/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(valToUpdate))
-            .andExpect(status().isBadRequest())
-            .andExpect(result -> assertTrue(
+        mockMvc.perform(
+                put(BASE_URL + "/1").contentType(MediaType.APPLICATION_JSON).content(valToUpdate))
+            .andExpect(status().isBadRequest()).andExpect(result -> assertTrue(
                 result.getResolvedException() instanceof HttpMessageConversionException));
     }
 }

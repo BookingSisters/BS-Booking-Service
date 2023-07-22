@@ -7,8 +7,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
+import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.enums.ReservationStatus;
 import com.bs.booking.models.Reservation;
 import com.bs.booking.models.SessionSeat;
@@ -40,6 +43,9 @@ class ReservationServiceTest {
     @Mock
     ReservationMapper reservationMapper;
 
+    @Mock
+    PaymentServiceClient paymentServiceClient;
+
     @DisplayName("모든 예약정보 가져오기")
     @Test
     void getAllReservation() {
@@ -64,7 +70,7 @@ class ReservationServiceTest {
     @Test
     void createReservation() {
         // given
-        ReservationCreateDto valuesForCreate = new ReservationCreateDto(1L, "testUser");
+        ReservationCreateDto valuesForCreate = new ReservationCreateDto("testUser");
         SessionSeat sessionSeat = new SessionSeat();
         Reservation reservation = new Reservation(sessionSeat, valuesForCreate.getUserId());
         ReservationResponseDto expectedReservation = new ReservationResponseDto();
@@ -77,8 +83,11 @@ class ReservationServiceTest {
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
         when(reservationMapper.toReservationResponseDto(any(Reservation.class))).thenReturn(
             expectedReservation);
+        when(paymentServiceClient.createPayment(any(PaymentCreateDto.class))).thenReturn(
+            new ResponseDto());
+
         // when
-        ReservationResponseDto created = reservationService.createReservation(valuesForCreate);
+        ReservationResponseDto created = reservationService.createReservation(1L, valuesForCreate);
         // then
         assertThat(created).isNotNull().isEqualTo(expectedReservation);
         verify(reservationRepository, times(1)).save(any(Reservation.class));

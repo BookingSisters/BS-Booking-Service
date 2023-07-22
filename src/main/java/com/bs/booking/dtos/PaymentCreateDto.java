@@ -12,7 +12,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ReservationCreateDto {
+public class PaymentCreateDto {
+
+    @NotNull(message = "예매 id는 필수입니다")
+    private Long reservationId;
 
     @NotNull(message = "사용자 id는 필수입니다")
     private String userId;

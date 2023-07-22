@@ -1,9 +1,14 @@
 package com.bs.booking.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
+import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.enums.ReservationStatus;
 import com.bs.booking.models.Reservation;
 import com.bs.booking.models.SessionSeat;
@@ -18,12 +23,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-import org.h2.engine.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,6 +50,10 @@ public class ReservationServiceMultiThreadedTest {
     @Autowired
     private ReservationMapper reservationMapper;
 
+    @MockBean
+    private PaymentServiceClient paymentServiceClient;
+
+
     private SessionSeat sessionSeat;
 
     @BeforeEach
@@ -57,13 +66,16 @@ public class ReservationServiceMultiThreadedTest {
     @Test
     void createReservation_whenMultiThreaded_shouldCreateOnlyOneReservation() {
         int threadCount = 10;
-        ReservationCreateDto createDto = new ReservationCreateDto(sessionSeat.getId(), "testUser");
+        ReservationCreateDto createDto = new ReservationCreateDto("testUser");
+
+        when(paymentServiceClient.createPayment(any(PaymentCreateDto.class))).thenReturn(new ResponseDto());
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Future<ReservationResponseDto>> futures = new ArrayList<>();
 
         for (int i = 0; i < threadCount; i++) {
-            futures.add(executor.submit(() -> reservationService.createReservation(createDto)));
+            futures.add(executor.submit(
+                () -> reservationService.createReservation(sessionSeat.getId(), createDto)));
         }
 
         List<ReservationResponseDto> results = futures.stream().map(future -> {
