@@ -1,5 +1,6 @@
 package com.bs.booking.controllers;
 
+import com.bs.booking.clients.SchedulerServiceClient;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
 import com.bs.booking.dtos.ReservationUpdateDto;
