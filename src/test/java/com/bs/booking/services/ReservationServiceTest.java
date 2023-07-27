@@ -16,6 +16,7 @@ import com.bs.booking.dtos.ReservationResponseDto;
 import com.bs.booking.dtos.SchedulerCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.enums.ReservationStatus;
+import com.bs.booking.exceptions.InvalidReservationStatusChangeException;
 import com.bs.booking.models.Reservation;
 import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.ReservationRepository;
@@ -107,7 +108,7 @@ class ReservationServiceTest {
     void updateStatus() {
         // given
         Long id = 1L;
-        Reservation reservation = new Reservation();
+        Reservation reservation = new Reservation(new SessionSeat(),"testUser");
         ReservationStatus statusForUpdate = ReservationStatus.TIME_OUT;
         ReservationResponseDto expectedReservation = ReservationResponseDto.builder()
             .status(statusForUpdate).build();
@@ -134,5 +135,20 @@ class ReservationServiceTest {
         // when, then
         assertThrows(IllegalArgumentException.class,
             () -> reservationService.updateStatus(incorrectId, statusForUpdate));
+    }
+
+    @DisplayName("예약 상태 수정: 예약 상태가 PENDING이 아닌 경우 예외 처리 테스트")
+    @Test
+    void updateStatus_whenReservationStatusIsNotPending_throwsProperException() {
+        // given
+        long id = 1L;
+        ReservationStatus statusForUpdate = ReservationStatus.COMPLETE;
+        Reservation dbReservation = new Reservation(new SessionSeat(),"testUser");
+        dbReservation.updateStatus(ReservationStatus.CANCEL);
+
+        when(reservationRepository.findById(id)).thenReturn(Optional.of(dbReservation));
+        // when, then
+        assertThrows(InvalidReservationStatusChangeException.class,
+            () -> reservationService.updateStatus(id, statusForUpdate));
     }
 }
