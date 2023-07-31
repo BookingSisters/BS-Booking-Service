@@ -3,14 +3,17 @@ package com.bs.booking.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.clients.SchedulerServiceClient;
 import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
+import com.bs.booking.dtos.SchedulerCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.enums.ReservationStatus;
 import com.bs.booking.models.Reservation;
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +49,9 @@ class ReservationServiceTest {
 
     @Mock
     PaymentServiceClient paymentServiceClient;
+
+    @Mock
+    SchedulerServiceClient schedulerServiceClient;
 
     @DisplayName("모든 예약정보 가져오기")
     @Test
@@ -85,6 +92,7 @@ class ReservationServiceTest {
             expectedReservation);
         when(paymentServiceClient.createPayment(any(PaymentCreateDto.class))).thenReturn(
             new ResponseDto());
+        doNothing().when(schedulerServiceClient).createTimeOutSchedule(any(SchedulerCreateDto.class));
 
         // when
         ReservationResponseDto created = reservationService.createReservation(1L, valuesForCreate);

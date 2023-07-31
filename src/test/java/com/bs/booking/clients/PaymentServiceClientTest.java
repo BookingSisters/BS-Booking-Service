@@ -9,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bs.booking.configs.AppProperties;
 import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.exceptions.PaymentServiceResponseException;
@@ -33,6 +34,9 @@ class PaymentServiceClientTest {
 
     @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private AppProperties appProperties;
 
     @BeforeEach
     void setUp() {

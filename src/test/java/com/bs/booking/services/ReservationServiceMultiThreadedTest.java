@@ -2,12 +2,15 @@ package com.bs.booking.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.clients.SchedulerServiceClient;
 import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
+import com.bs.booking.dtos.SchedulerCreateDto;
 import com.bs.booking.dtos.common.ResponseDto;
 import com.bs.booking.enums.ReservationStatus;
 import com.bs.booking.models.Reservation;
@@ -53,6 +56,9 @@ public class ReservationServiceMultiThreadedTest {
     @MockBean
     private PaymentServiceClient paymentServiceClient;
 
+    @MockBean
+    private SchedulerServiceClient schedulerServiceClient;
+
 
     private SessionSeat sessionSeat;
 
@@ -69,6 +75,8 @@ public class ReservationServiceMultiThreadedTest {
         ReservationCreateDto createDto = new ReservationCreateDto("testUser");
 
         when(paymentServiceClient.createPayment(any(PaymentCreateDto.class))).thenReturn(new ResponseDto());
+        doNothing().when(schedulerServiceClient).createTimeOutSchedule(any(
+            SchedulerCreateDto.class));
 
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Future<ReservationResponseDto>> futures = new ArrayList<>();

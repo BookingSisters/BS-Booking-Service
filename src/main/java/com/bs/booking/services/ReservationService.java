@@ -1,9 +1,11 @@
 package com.bs.booking.services;
 
 import com.bs.booking.clients.PaymentServiceClient;
+import com.bs.booking.clients.SchedulerServiceClient;
 import com.bs.booking.dtos.PaymentCreateDto;
 import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
+import com.bs.booking.dtos.SchedulerCreateDto;
 import com.bs.booking.enums.ReservationStatus;
 import com.bs.booking.exceptions.ReservationInProgressException;
 import com.bs.booking.exceptions.ReservationNotFoundException;
@@ -13,14 +15,13 @@ import com.bs.booking.models.SessionSeat;
 import com.bs.booking.repositories.ReservationRepository;
 import com.bs.booking.repositories.SessionSeatRepository;
 import com.bs.booking.utils.mapper.ReservationMapper;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class ReservationService {
     private final SessionSeatRepository sessionSeatRepository;
     private final ReservationMapper reservationMapper;
     private final PaymentServiceClient paymentServiceClient;
+    private final SchedulerServiceClient schedulerServiceClient;
 
     @Transactional(readOnly = true)
     public List<ReservationResponseDto> getAllReservation() {
@@ -65,9 +67,14 @@ public class ReservationService {
         Reservation newReservation = new Reservation(dbSessionSeat, valuesForCreate.getUserId());
         reservationRepository.save(newReservation);
 
-        PaymentCreateDto paymentCreateDto = new PaymentCreateDto(newReservation.getId(),
-            valuesForCreate.getUserId());
+        Long newReservationId = newReservation.getId();
+        String newUserId = newReservation.getUserId();
+
+        PaymentCreateDto paymentCreateDto = new PaymentCreateDto(newReservationId, newUserId);
         paymentServiceClient.createPayment(paymentCreateDto);
+
+        SchedulerCreateDto schedulerCreateDto = new SchedulerCreateDto(newReservationId, newUserId);
+        schedulerServiceClient.createTimeOutSchedule(schedulerCreateDto);
 
         log.info("Successfully created reservation");
         return reservationMapper.toReservationResponseDto(newReservation);
