@@ -1,6 +1,7 @@
 package com.bs.booking.models;
 
 import com.bs.booking.enums.ReservationStatus;
+import com.bs.booking.exceptions.InvalidReservationStatusChangeException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -40,7 +41,16 @@ public class Reservation extends BaseEntity {
         this.status = ReservationStatus.PENDING;
     }
 
-    public void setStatus(ReservationStatus status) {
+    public void updateStatus(ReservationStatus status) {
+        if (status == ReservationStatus.PENDING) {
+            throw new InvalidReservationStatusChangeException(
+                "Pending status can only be assigned when creating a reservation.", status);
+        }
+        if (this.status != ReservationStatus.PENDING) {
+            throw new InvalidReservationStatusChangeException(
+                "Changes are only possible when the reservation is in a pending state.", status);
+        }
         this.status = status;
     }
+
 }

@@ -7,6 +7,7 @@ import com.bs.booking.dtos.ReservationCreateDto;
 import com.bs.booking.dtos.ReservationResponseDto;
 import com.bs.booking.dtos.SchedulerCreateDto;
 import com.bs.booking.enums.ReservationStatus;
+import com.bs.booking.exceptions.InvalidReservationStatusChangeException;
 import com.bs.booking.exceptions.ReservationInProgressException;
 import com.bs.booking.exceptions.ReservationNotFoundException;
 import com.bs.booking.exceptions.SeatNotFoundException;
@@ -88,7 +89,11 @@ public class ReservationService {
             log.error("Error when updating reservation, reservation not found with id: {}", id);
             return new ReservationNotFoundException(id);
         });
-        dbReservation.setStatus(statusForUpdate);
+
+        ReservationStatus oldStatus = dbReservation.getStatus();
+        dbReservation.updateStatus(statusForUpdate);
+        log.info("Successfully updated reservation status from {} to {}",
+            oldStatus, statusForUpdate);
         return reservationMapper.toReservationResponseDto(dbReservation);
     }
 }
